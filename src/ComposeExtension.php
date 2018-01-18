@@ -8,4 +8,14 @@
  * file that was distributed with this source code.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace Devtronic\TwigCompose;
+
+class ComposeExtension extends \Twig_Extension
+{
+    public function getNodeVisitors()
+    {
+        return [
+            new ComposeNodeVisitor(),
+        ];
+    }
+}
