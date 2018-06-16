@@ -98,7 +98,7 @@ class ComposeEnvironment extends Twig_Environment
 
     public function loadTemplate($name, $index = null)
     {
-        if (isset($this->loadingTemplates[$name])) {
+        if (is_array($name) || is_object($name) || isset($this->loadingTemplates[$name])) {
             return parent::loadTemplate($name, $index);
         }
 
