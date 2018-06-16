@@ -98,22 +98,16 @@ class ComposeEnvironment extends Twig_Environment
 
     public function loadTemplate($name, $index = null)
     {
-        if (!is_array($name) && !is_object($name) && isset($this->loadingTemplates[$name])) {
-            return $this->loadingTemplates[$name];
+        if (isset($this->loadingTemplates[$name])) {
+            return parent::loadTemplate($name, $index);
         }
-        $this->preLoadTemplate($name);
+
+        if ($this->autoCompose) {
+            $this->loadingTemplates[$name] = false;
+        }
         $template = parent::loadTemplate($name, $index);
         $template = $this->postLoadTemplate($name, $template);
         return $template;
-    }
-
-    public function preLoadTemplate($name)
-    {
-        if ($this->autoCompose == false) {
-            return;
-        }
-        $this->loadingTemplates[$name] = null;
-
     }
 
     public function postLoadTemplate($name, $template)
@@ -122,7 +116,7 @@ class ComposeEnvironment extends Twig_Environment
             return $template;
         }
 
-        $this->loadingTemplates[$name] = $template;
+        $this->loadingTemplates[$name] = true;
         return self::doCompose($this, $template, $this->getTemplatesForAutoCompose($name));
     }
 
