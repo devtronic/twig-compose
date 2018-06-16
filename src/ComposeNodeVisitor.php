@@ -10,11 +10,10 @@
 
 namespace Devtronic\TwigCompose;
 
-use Twig\NodeVisitor\AbstractNodeVisitor;
 use Twig_Environment;
 use Twig_Node;
 
-class ComposeNodeVisitor extends AbstractNodeVisitor
+class ComposeNodeVisitor extends \Twig_BaseNodeVisitor
 {
     /**
      * Called before child nodes are visited.

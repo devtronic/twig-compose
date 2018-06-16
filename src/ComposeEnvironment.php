@@ -82,10 +82,10 @@ class ComposeEnvironment extends Twig_Environment
     private function getTemplatesForAutoCompose($templateName)
     {
         $templates = [];
-        foreach ($this->loader->getNamespaces() as $namespace) {
+        foreach ($this->getLoader()->getNamespaces() as $namespace) {
             $tmpNamespace = str_replace(\Twig_Loader_Filesystem::MAIN_NAMESPACE, '', $namespace);
             if (substr($templateName, 0, strlen($tmpNamespace)) != $tmpNamespace) {
-                foreach ($this->loader->getPaths($namespace) as $path) {
+                foreach ($this->getLoader()->getPaths($namespace) as $path) {
                     if (is_file($path . '/' . $templateName)) {
                         $templates[] = "@$namespace/$templateName";
                     }
