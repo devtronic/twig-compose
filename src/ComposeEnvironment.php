@@ -15,6 +15,10 @@ use Twig_LoaderInterface;
 
 class ComposeEnvironment extends Twig_Environment
 {
+    private $autoCompose = false;
+
+    private $loadingTemplates = [];
+
     /**
      * Creates a new Twig_Environment with the compose functionality
      *
@@ -61,7 +65,11 @@ class ComposeEnvironment extends Twig_Environment
             throw new \Exception(sprintf('You must add the %s to the %s', ComposeExtension::class, get_class($twig)));
         }
         $baseTemplate = $twig->resolveTemplate($baseName);
+        return self::doCompose($twig, $baseTemplate, $childNames);
+    }
 
+    private static function doCompose(\Twig_Environment &$twig, &$baseTemplate, array $childNames)
+    {
         $prevTemplate = $baseTemplate;
         foreach ($childNames as $childName) {
             $tmpTemplate = $twig->resolveTemplate($childName);
@@ -69,5 +77,70 @@ class ComposeEnvironment extends Twig_Environment
             $prevTemplate = $tmpTemplate;
         }
         return $prevTemplate;
+    }
+
+    private function getTemplatesForAutoCompose($templateName)
+    {
+        $templates = [];
+        foreach ($this->getLoader()->getNamespaces() as $namespace) {
+            $tmpNamespace = str_replace(\Twig_Loader_Filesystem::MAIN_NAMESPACE, '', $namespace);
+            if (substr($templateName, 0, strlen($tmpNamespace)) != $tmpNamespace) {
+                foreach ($this->getLoader()->getPaths($namespace) as $path) {
+                    if (is_file($path . '/' . $templateName)) {
+                        $templates[] = "@$namespace/$templateName";
+                    }
+                }
+            }
+        }
+
+        return $templates;
+    }
+
+    public function loadTemplate($name, $index = null)
+    {
+        if (isset($this->loadingTemplates[$name])) {
+            return $this->loadingTemplates[$name];
+        }
+        $this->preLoadTemplate($name);
+        $template = parent::loadTemplate($name, $index);
+        $template = $this->postLoadTemplate($name, $template);
+        return $template;
+    }
+
+    public function preLoadTemplate($name)
+    {
+        if ($this->autoCompose == false) {
+            return;
+        }
+        $this->loadingTemplates[$name] = null;
+
+    }
+
+    public function postLoadTemplate($name, $template)
+    {
+        if ($this->autoCompose == false) {
+            return $template;
+        }
+
+        $this->loadingTemplates[$name] = $template;
+        return self::doCompose($this, $template, $this->getTemplatesForAutoCompose($name));
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAutoCompose()
+    {
+        return $this->autoCompose;
+    }
+
+    /**
+     * @param bool $autoCompose
+     * @return ComposeEnvironment
+     */
+    public function setAutoCompose($autoCompose)
+    {
+        $this->autoCompose = $autoCompose;
+        return $this;
     }
 }

@@ -16,11 +16,17 @@ class ComposeNode extends \Twig_Node
 {
     public function compile(Twig_Compiler $compiler)
     {
+        $this->writeSetParentFunction($compiler);
+    }
+
+    private function writeSetParentFunction(Twig_Compiler $compiler)
+    {
         $compiler
+            ->write("\n")
             ->write("public function setParent(\\Twig_Template \$parent)\n")
             ->write("{\n")
             ->indent()
-            ->write("\$this->parent = \$parent;")
+            ->write("\$this->parent = \$parent;\n")
             ->outdent()
             ->write("}\n");
     }
