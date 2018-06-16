@@ -41,3 +41,23 @@ $template = $twig->compose('base.html.twig', ['pluginA.html.twig', 'pluginB.html
 
 echo $template->render([]);
 ```
+
+### ➡ Auto composing templates (Experimental & ComposeEnvironment only)
+```php
+<?php
+
+use Devtronic\TwigCompose\ComposeEnvironment;
+
+$loader = new \Twig_Loader_Filesystem('/res/main-theme');
+$twig = new ComposeEnvironment($loader);
+$loader->addPath('/res/theme1', 'Theme1');
+$loader->addPath('/res/theme2', 'Theme2');
+
+// If autocompose is enabled, all registered paths will be checked.
+// If a file with the the same name (e.g. base.html.twig) exists,
+// it will be loaded & composed with the `base.html.twig` inside the main-theme folder
+$twig->setAutoCompose(true); 
+$template = $twig->load('base.html.twig');
+
+echo $template->render([]);
+```
