@@ -13,6 +13,9 @@ which contains every content of every child template 🌠
 $ composer require devtronic/twig-compose
 ```
 
+## ❤ Sponsors
+No sponsors at the moment. [Become a sponsor](https://github.com/sponsors/devtronic)
+
 ## 🛠 Usage
 For details take a look in the tests directory
 ### ➡ With a your existing Twig_Environment
